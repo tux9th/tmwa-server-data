@@ -9,7 +9,6 @@
 
     set @ANIMALBONES_AMOUNT, 30;
     set @ANIMALBONES_EXP, 40000;
-    set @money, 1000;
     set @minLevel, 80;
 
     if (@state > 1) goto L_Happy;
@@ -79,85 +78,9 @@ L_Happy:
     mes "[Wolfgang]";
     mes "\"Delicious. Thanks again.\"";
     next;
-    mes "\"By the way... would you be interested in a little round of blackjack?\"";
-    mes "He pulls a deck of cards out of his pocket.";
-    next;
-    mes "[Wolfgang]";
-    mes "\"You will need " + @money + " GP.\"";
-    menu
-        "Sure, why not?",L_Game,
-        "No, thanks.",-;
-    goto L_Close;
-
-//The game mechanics is copied from casino.txt
-L_Game:
-    if (Zeny < @money)
-        goto L_No_Money;
-    mes "[Wolfgang]";
-    mes "\"Very nice. Let's start.\"";
-    mes "He shuffles the cards.";
-    next;
-    set Zeny, Zeny - @money;
-    set @croupier, rand(0, 4);
-    set @croupier, @croupier + 17;
-    set @player, rand(4, 21);
-    mes "\"You got " + @player + " with your cards.";
-    if (@player == 21)
-        goto L_End;
-    mes "Do you want another card?\"";
-    next;
-    menu
-        "Yes.", L_Another,
-        "No.", L_End;
-
-L_Another:
-    set @tempace, rand(2, 11);
-    if (@tempace == 11)
-        goto L_Ace;
-    set @player, @player + @tempace;
-    if (@player > 21)
-        goto L_Lost;
-    if (@player == 21)
-        goto L_End;
-    mes "\"You got " + @player + " with your cards.";
-    mes "Do you want another card?\"";
-    next;
-    menu
-        "Yes", L_Another,
-        "No", L_End;
-
-L_End:
-    if (@player <= @croupier)
-        goto L_Lost;
-    mes "\"You won! Hrm, here is your money.\"";
-    set Zeny, Zeny + (3 * @money);
-    goto L_Close;
-
-L_No_Money:
-    mes "\"You need at least " + @money + " GP.\"";
-    goto L_Close;
-
-L_Lost:
-    mes "[Wolfgang]";
-    mes "\"Fine! I won!";
-    mes "You got " + @player + " with your cards.";
-    mes "I had " + @croupier + ".\"";
-    goto L_Close;
-
-L_Ace:
-    set @player, @player + 11;
-    if (@player > 21)
-        set @player, @player - 10;
-    if (@player > 21)
-        goto L_Lost;
-    if (@player == 21)
-        goto L_End;
-    mes "You got " + @player + " with your cards.";
-    mes "Do you want another card?";
-    next;
-    menu
-        "Yes", L_Another,
-        "No", L_End;
+    set @money, 1000;
+    set @blackjackname$, "Wolfgang";
+    callfunc "BlackJack";
     goto L_Close;
 
 L_Close:

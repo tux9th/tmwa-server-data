@@ -1,0 +1,147 @@
+// Author tux9th
+// Variables to set:
+//      @money - How much every round costs.
+//      @blackjackname$ - name of the NPC.
+// Dynamic Variables:
+//      @player1    - the player's first drawn card.
+//      @player2    - the player's second drawn card.
+//      @player3    - the sum of all the player's cards
+//      @player4    - all other drawn cards by the player
+//
+//      @bank1      - the bank's first drawn card.
+//      @bank2      - the bank's second drawn card.
+//      @bank3      - the sum of all the bank's cards
+//      @bank4      - all other drawn cards by the bank
+
+function|script|BlackJack|,{
+    mes "[" + @blackjackname$ + "]";
+    mes "\"Would you be interested to play a round of Black Jack?";
+    mes "\"You will need " + @money + " GP.\"";
+    menu
+        "Yes.", L_Begin,
+        "No.", -;
+    mes "\"As you wish.\"";
+    goto L_Close;
+
+L_Begin:
+    if (Zeny < @money)
+        goto L_NotEnoughMoney;
+    set Zeny, Zeny - @money;
+    goto L_Bank;
+
+L_NotEnoughMoney:
+    mes "\"You do not have enough money!\"";
+    goto L_Close;
+
+L_Bank:
+    set @bank1, rand(2,11);
+    set @bank2, rand(2,11);
+    set @bank3, @bank1 + @bank2;
+    if (@bank3 > 21)
+        set @bank3, @bank3 - 10;
+    if (@bank3 < 17)
+        goto L_NextDraw;
+    goto L_Player;
+
+L_NextDraw:
+    set @bank4, rand(2,11);
+    if (@bank4 == 11 && (@bank3 + @bank4 > 21))
+        set @bank4, 1;
+    set @bank3, @bank3 + @bank4;
+    if (@bank3 < 17)
+        goto L_NextDraw;
+    goto L_Player;
+
+L_Player:
+    set @player1, rand(2,11);
+    set @player2, rand(2,11);
+    mes "You drew " + @player1 + " and " + @player2;
+    if (@player1 != 11)
+        goto L_Player1;
+    mes "You can choose if Ace is 11 or 1";
+    menu
+        "11", L_Player1,
+        "1", -;
+    set @player1, 1;
+
+L_Player1:
+    if (@player2 != 11)
+        goto L_Player2;
+    mes "You can choose if Ace is 11 or 1";
+    menu
+        "11", L_Player2,
+        "1", -;
+    set @player2, 1;
+
+L_Player2:
+        
+    set @player3, @player1 + @player2;
+    if (@player3 > 21)
+        goto L_Fail;
+    mes "\"Do you want to draw another card?\"";
+    menu
+        "Yes.", L_PlayerAnother,
+        "No.", L_End;
+
+L_PlayerAnother:
+    set @player4, rand(2,11);
+    if (@player4 != 11)
+        goto L_PlayerAnother1;
+    mes "You can choose if Ace is 11 or 1";
+    menu
+        "11", L_PlayerAnother1,
+        "1", -;
+    set @player4, 1;
+
+L_PlayerAnother1:
+    set @player3, @player3 + @player4;
+    mes "You drew " + @player4 + ", total " + @player3;
+    if (@player3 == 21)
+        goto L_End;
+    if (@player3 > 21)
+        goto L_Fail;
+    mes "\"Do you want to draw another card?\"";
+    menu
+        "Yes.", L_PlayerAnother,
+        "No.", L_End;
+
+L_Fail:
+    mes "\"You lost. You had " + @player3 + ", I had " + @bank3 + ".\"";
+    goto L_Close;
+
+L_End:
+    if (@player3 > 21)
+        goto L_Fail;
+    if (@bank3 > 21)
+        goto L_Win;
+    if (@bank3 == @player3)
+        goto L_Tie;
+    if (@bank3 < @player3)
+        goto L_Win;
+    if (@bank3 > @player3)
+        goto L_Fail;
+    goto L_Close;
+
+L_Win:
+    mes "\"You won. You had " + @player3 + ", I had " + @bank3 + ".\"";
+    set Zeny, Zeny + 2*@money;
+    goto L_Close;
+
+L_Tie:
+    mes "\"You had " + @player3 + ", I had " + @bank3 + ". It's a tie! Nobody wins. You'll get your money back.\"";
+    set Zeny, Zeny + @money;
+    goto L_Close;
+
+L_Close:
+    set @money, 0;
+    set @blackjackname$, "";
+    set @player1, 0;
+    set @player2, 0;
+    set @player3, 0;
+    set @player4, 0;
+    set @bank1, 0;
+    set @bank2, 0;
+    set @bank3, 0;
+    set @bank4 ,0;
+    return;
+}
