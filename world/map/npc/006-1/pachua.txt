@@ -2,12 +2,51 @@
     set @LEATHER_PATCH_PRICE, 300;
 // @wants_leather_patch is used as boolean
     set @wants_leather_patch, QUEST_Forestbow_state & NIBBLE_4_MASK;
+// This belongs to the Pachua Food Quest
+    setarray @pachua_itemcosts, 1, 4, 16, 32, 64, 256;
 
     if ((gettime(5) >= $@xmas2011_start_day) && (gettime(5) < $@xmas2011_reward_start_day) && (gettime(6) == 12) && (gettime(7) == $@xmas2011_year))
         set @wants_leather_patch, @wants_leather_patch | (xmas11 & $@xmas11_talkedToChief);
 
     set $@xmas2011_start_day, 10;
     set $@xmas2011_reward_start_day, 25;
+
+// Bitmasks for Pachua Food Quest
+    set @Pachua_MASK, NIBBLE_0_MASK;
+    set @Pachua_SHIFT, NIBBLE_0_SHIFT;
+
+    set @state, ((QUEST_Pachua & @Pachua_MASK) >> @Pachua_SHIFT);
+
+    set @Pachua_Chicken_MASK, NIBBLE_1_MASK;
+    set @Pachua_Chicken_SHIFT, NIBBLE_1_SHIFT;
+
+    set @chicken, ((QUEST_Pachua & @Pachua_Chicken_MASK) >> @Pachua_Chicken_SHIFT);
+
+    set @Pachua_Steak_MASK, NIBBLE_2_MASK;
+    set @Pachua_Steak_SHIFT, NIBBLE_2_SHIFT;
+
+    set @steak, ((QUEST_Pachua & @Pachua_Steak_MASK) >> @Pachua_Steak_SHIFT);
+
+    set @Pachua_Cotton_MASK, NIBBLE_3_MASK;
+    set @Pachua_Cotton_SHIFT, NIBBLE_3_SHIFT;
+
+    set @cotton, ((QUEST_Pachua & @Pachua_Cotton_MASK) >> @Pachua_Cotton_SHIFT);
+
+    set @Pachua_Egg_MASK, NIBBLE_4_MASK;
+    set @Pachua_Egg_SHIFT, NIBBLE_4_SHIFT;
+
+    set @egg, ((QUEST_Pachua & @Pachua_Egg_MASK) >> @Pachua_Egg_SHIFT);
+
+    set @Pachua_Water_MASK, NIBBLE_5_MASK;
+    set @Pachua_Water_SHIFT, NIBBLE_5_SHIFT;
+
+    set @water, ((QUEST_Pachua & @Pachua_Water_MASK) >> @Pachua_Water_SHIFT);
+
+    set @Pachua_Cake_MASK, NIBBLE_6_MASK;
+    set @Pachua_Cake_SHIFT, NIBBLE_6_SHIFT;
+
+    set @cake, ((QUEST_Pachua & @Pachua_Cake_MASK) >> @Pachua_Cake_SHIFT);
+
 
 // lines belong to easter 2011:
 //    set @month, 4;
@@ -31,10 +70,15 @@ L_Begin:
     mes "";
     mes "\"How!\"";
     next;
+    if (BaseLevel > 39)
+        goto L_PachuaFood;
+    goto L_Begin2;
 
+L_Begin2:
+    menu    "Reset", L_Reset,
+            "Procede", -;
     if (getequipid(equip_head) == 643 || getequipid(equip_head) == 644) goto L_WearingCowboy;
     if (getequipid(equip_legs) == 642) goto L_WearingChaps;
-
     mes "[Chief Pachua]";
     mes "";
     mes "\"For generations my tribe has been crafting special clothes out of different items.\"";
@@ -54,6 +98,246 @@ L_Check_Shops:
             "Wait, can you make a leather patch for me?", L_leather_patch,
             "OK, bye.", -;
     goto L_Close;
+
+L_PachuaFood:
+    if (@state > 7)
+        goto L_Begin2;
+    if (@state == 7)
+        goto L_Prize;
+    if (@state > 0)
+        goto L_Logic;
+    if(countitem("Steak") > 4 || countitem("ChickenLeg") > 4 || countitem(715) > 4 ||  countitem("CottonCloth") > 4 || countitem("Cake") > 4 || countitem("ChocolateCake") > 4 || countitem("OrangeCake") > 4 || countitem("AppleCake") > 4 || countitem("WhiteCake") > 4 || countitem("IcedWater") > 4)
+        goto L_BeginFood;
+    goto L_Begin2;
+
+L_BeginFood:
+    mes "[Pachua]";
+    mes "\"Oh you smell so full of food\"";
+    mes "\"This part of the dessert can be very depressing.\"";
+    mes "\"I am dying for a good meal, if you could help me with this, I would give up one of my prized possessions\"";
+    menu    "Yes", -,
+            "No", L_Begin2;
+    mes "[Pachua]";
+    mes "\"I have dreamed of a great picnic, with meats, eggs, an ice cold beverage and of course dessert\"";
+    mes "\"But please remember the more i get to eat, the more i can eat!\"";
+    set @state, 1;
+    callsub S_Update_Mask;
+    goto L_Logic;
+
+L_Logic:
+    mes "[Pachua]";
+    mes "\"Did you bring something to eat?\"";
+    menu    "Yes", -,
+            "No", L_Begin2;
+    mes "\"What did you bring me to eat?\"";
+    mes "State";
+    mes @state;
+    mes "Please write in lowercase letters and leave out the white spaces e.g: cottoncloth";
+    input @pachua_item$;
+    mes @pachua_item$;
+    if (@pachua_item$ == "whitecake" || @pachua_item$ == "cake" || @pachua_item$ == "orangecake" || @pachua_item$ == "chocolatecake" || @pachua_item$ == "applecake")
+        goto L_Cake;
+    if (@pachua_item$ == "icedwater")
+        goto L_Water;
+    if (@pachua_item$ == "steak")
+        goto L_Steak;
+    if (@pachua_item$ == "mountainsnakeegg")
+        goto L_Egg;
+    if (@pachua_item$ == "chickenleg")
+        goto L_Chicken;
+    if (@pachua_item$ == "cottoncloth")
+        goto L_Cotton;
+    mes "This is not on the list";
+    menu    "Reset State", L_Reset,
+            "Nothing", -;
+    close;
+
+L_Reset:
+    set @state, 0;
+    callsub S_Update_Mask;
+    set @chicken, 0;
+    callsub S_Update_Mask_Chicken;
+    set @water, 0;
+    callsub S_Update_Mask_Water;
+    set @steak, 0;
+    callsub S_Update_Mask_Steak;
+    set @cotton, 0;
+    callsub S_Update_Mask_Cotton;
+    set @egg, 0;
+    callsub S_Update_Mask_Egg;
+    set @cake, 0;
+    callsub S_Update_Mask_Cake;
+    close;
+
+L_Chicken:
+    if (@chicken == 1)
+        goto L_SomeThingElse;
+    set @pachua_itemcost, @pachua_itemcosts[@state - 1];
+    if (countitem("ChickenLeg") < @pachua_itemcost)
+        goto L_NotEnough;
+    delitem "ChickenLeg", @pachua_itemcost;
+    set @state, @state + 1;
+    callsub S_Update_Mask;
+    set @chicken, 1;
+    callsub S_Update_Mask_Chicken;
+    next;
+    goto L_Pleased;
+
+L_Steak:
+    if (@steak == 1)
+        goto L_SomeThingElse;
+    set @pachua_itemcost, @pachua_itemcosts[@state - 1];
+    if (countitem("Steak") < @pachua_itemcost)
+        goto L_NotEnough;
+    delitem "Steak", @pachua_itemcost;
+    set @state, @state + 1;
+    callsub S_Update_Mask;
+    set @steak, 1;
+    callsub S_Update_Mask_Steak;
+    next;
+    goto L_Pleased;
+
+L_Egg:
+    if (@egg == 1)
+        goto L_SomeThingElse;
+    set @pachua_itemcost, @pachua_itemcosts[@state - 1];
+    if (countitem("MountainSnakeEgg") < @pachua_itemcost)
+        goto L_NotEnough;
+    delitem "MountainSnakeEgg", @pachua_itemcost;
+    set @state, @state + 1;
+    callsub S_Update_Mask;
+    set @egg, 1;
+    callsub S_Update_Mask_Egg;
+    next;
+    goto L_Pleased;
+
+L_Cotton:
+    if (@cotton == 1)
+        goto L_SomeThingElse;
+    set @pachua_itemcost, @pachua_itemcosts[@state - 1];
+    if (countitem("CottonCloth") < @pachua_itemcost)
+        goto L_NotEnough;
+    delitem "CottonCloth", @pachua_itemcost;
+    set @state, @state + 1;
+    callsub S_Update_Mask;
+    set @cotton, 1;
+    callsub S_Update_Mask_Cotton;
+    next;
+    goto L_Pleased;
+
+L_Water:
+    if (@water == 1)
+        goto L_SomeThingElse;
+    set @pachua_itemcost, @pachua_itemcosts[@state - 1];
+    if (countitem("IcedWater") < @pachua_itemcost)
+        goto L_NotEnough;
+    delitem "IcedWater", @pachua_itemcost;
+    set @state, @state + 1;
+    callsub S_Update_Mask;
+    set @water, 1;
+    callsub S_Update_Mask_Water;
+    goto L_Pleased;
+
+L_Cake:
+    if (@cake == 1)
+        goto L_SomeThingElse;
+    set @pachua_itemcost, @pachua_itemcosts[@state - 1];
+    set @pachua_whitecake, countitem("WhiteCake");
+    set @pachua_chocolatecake, countitem("ChocolateCake");
+    set @pachua_cake, countitem("Cake");
+    set @pachua_orangecake, countitem("OrangeCake");
+    set @pachua_applecake, countitem("AppleCake");
+    set @pachua_allcakes, @pachua_applecake + @pachua_orangecake + @pachua_cake + @pachua_chocolatecake + @pachua_whitecake;
+    if (@pachua_allcakes < @pachua_itemcost)
+        goto L_NotEnough;
+    if (@pachua_whitecake > 0 && @pachua_whitecake <= @pachua_itemcost)
+        goto L_WhiteCake;
+L_Cake1:
+    if (@pachua_whitecake > @pachua_itemcost)
+        delitem "WhiteCake", @pachua_itemcost;
+
+    if (@pachua_chocolatecake > 0 && @pachua_chocolatecake <= @pachua_itemcost)
+        goto L_ChocolateCake;
+L_Cake2:
+    if (@pachua_chocolatecake > @pachua_itemcost)
+        delitem "ChocolateCake", @pachua_itemcost;
+
+    if (@pachua_cake > 0 && @pachua_cake <= @pachua_itemcost)
+        goto L_ItemCake;
+L_Cake3:
+    if (@pachua_cake > @pachua_itemcost)
+        delitem "Cake", @pachua_itemcost;
+
+    if (@pachua_applecake > 0 && @pachua_applecake <= @pachua_itemcost)
+        goto L_AppleCake;
+L_Cake4:
+    if (@pachua_applecake > @pachua_itemcost)
+        delitem "AppleCake", @pachua_itemcost;
+
+    if (@pachua_orangecake > 0 && @pachua_orangecake <= @pachua_itemcost)
+            goto L_OrangeCake;
+L_Cake5:
+    if (@pachua_orangecake > @pachua_itemcost)
+        delitem "OrangeCake", @pachua_itemcost;
+
+    set @state, @state + 1;
+    callsub S_Update_Mask;
+    set @cake, 1;
+    callsub S_Update_Mask_Cake;
+    goto L_Pleased;
+
+L_WhiteCake:
+    delitem "WhiteCake", @pachua_whitecake;
+    set @pachua_itemcost, @pachua_itemcost - @pachua_whitecake;
+    goto L_Cake1;
+
+L_ChocolateCake:
+    delitem "ChocolateCake", @pachua_chocolatecake;
+    set @pachua_itemcost, @pachua_itemcost - @pachua_chocolatecake;
+    goto L_Cake2;
+
+L_ItemCake:
+    delitem "Cake", @pachua_cake;
+    set @pachua_itemcost, @pachua_itemcost - @pachua_cake;
+    goto L_Cake3;
+
+L_AppleCake:
+    delitem "AppleCake", @pachua_applecake;
+    set @pachua_itemcost, @pachua_itemcost - @pachua_applecake;
+    goto L_Cake4;
+
+L_OrangeCake:
+    delitem "OrangeCake", @pachua_orangecake;
+    set @pachua_itemcost, @pachua_itemcost - @pachua_orangecake;
+    goto L_Cake5;
+
+L_NotEnough:
+    mes "\"That's great but I need more of that.\"";
+    close;
+
+L_SomeThingElse:
+    mes "[Pachua]";
+    mes "\"Oh I had that already. Bring me something else please.\"";
+    close;
+
+L_Prize:
+    mes "Pachua burps";
+    next;
+    mes "[Pachua]";
+    mes "\"Now that was a good meal!\"";
+    mes "\"Please take this item for your hard work!\"";
+    getitem "ChristmasTreehat", 1;
+    set @state, @state + 1;
+    callsub S_Update_Mask;
+    close;
+
+L_Pleased:
+    mes "[Pachua]";
+    mes "\"Thank you, cross that off the list.\"";
+    next;
+    if (@state == 7)
+        goto L_Prize;
+    goto L_Logic;
 
 S_CheckStuff:
     mes "[Chief Pachua]";
@@ -326,4 +610,47 @@ L_SeeBunny:
 L_TrickOrTreat:
     callfunc "TrickOrTreat2011";
     goto L_Begin;
+
+// Subfunctions for Bitmasks for Pachua Food Quest
+S_Update_Mask_Chicken:
+    set QUEST_Pachua,
+        (QUEST_Pachua & ~(@Pachua_Chicken_MASK))
+            | (@chicken << @Pachua_Chicken_SHIFT);
+    return;
+S_Update_Mask_Steak:
+    set QUEST_Pachua,
+        (QUEST_Pachua & ~(@Pachua_Steak_MASK))
+            | (@Steak << @Pachua_Steak_SHIFT);
+    return;
+
+S_Update_Mask_Cotton:
+    set QUEST_Pachua,
+        (QUEST_Pachua & ~(@Pachua_Cotton_MASK))
+            | (@cotton << @Pachua_Cotton_SHIFT);
+    return;
+
+S_Update_Mask_Egg:
+    set QUEST_Pachua,
+        (QUEST_Pachua & ~(@Pachua_Egg_MASK))
+            | (@egg << @Pachua_Egg_SHIFT);
+    return;
+
+S_Update_Mask_Water:
+    set QUEST_Pachua,
+        (QUEST_Pachua & ~(@Pachua_Water_MASK))
+            | (@water << @Pachua_Water_SHIFT);
+    return;
+
+S_Update_Mask_Cake:
+    set QUEST_Pachua,
+        (QUEST_Pachua & ~(@Pachua_Cake_MASK))
+            | (@cake << @Pachua_Cake_SHIFT);
+    return;
+
+S_Update_Mask:
+    set QUEST_Pachua,
+        (QUEST_Pachua & ~(@Pachua_MASK))
+            | (@state << @Pachua_SHIFT);
+    return;
+
 }
