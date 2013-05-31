@@ -118,7 +118,13 @@ L_Close:
     next;
     mes "You're losing control of your body... everything turns black... while slipping to the floor, you hear a faraway scream... suddenly, you see THE LIGHT!";
     next;
+    if (Hardcore == 1)
+        goto L_Hardcore;
     heal -Hp, 0;
+    close;
+
+L_Hardcore:
+    percentheal "-99";
     close;
 }
 
