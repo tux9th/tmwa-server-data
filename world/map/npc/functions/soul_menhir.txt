@@ -7,6 +7,9 @@ function|script|SoulMenhir|{
         "Touch it.", -,
         "Leave it alone.", L_Return;
 
+    if (Hardcore == 1)
+        goto L_Hardcore;
+
     if (Menhir_Activated == 1)
         goto L_Shortversion;
 
@@ -43,6 +46,11 @@ L_FindPoint:
     set @x, @Xs[@n];
     set @y, @Ys[@n];
     goto L_Do_Save;
+
+L_Hardcore:
+    mes "[Soul Menhir]";
+    mes "(The moment your hand touches the stone you feel a strange power repulsing you.)";
+    close;
 
 L_Return:
     return;
