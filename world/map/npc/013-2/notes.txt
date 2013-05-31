@@ -124,6 +124,7 @@ L_Close:
     close;
 
 L_Hardcore:
+    percentheal "100";
     percentheal "-99";
     close;
 }
