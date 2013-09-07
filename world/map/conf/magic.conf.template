@@ -714,6 +714,21 @@ SPELL magic-knuckles : "#W12" =
                     CALL install_melee_spell(10 + spellpower / 10, 1300, 34);
              ATTRIGGER CALL melee_damage(target, 30, 5 + (str * 2));
 
+SPELL acorn-dart : "#W13" =
+      LET level = 1
+          school = WAR
+      IN (MANA 10, CASTTIME 500,
+          REQUIRE skill(caster, MAGIC) > level,
+          (REQUIRE skill(caster, school) > 2 OR COMPONENTS ["Acorn"]))
+          => EFFECT CALL adjust_spellpower(school);
+                    CALL default_effect();
+                    damage = 2 * sqrt(spellpower);
+                    damage_bonus = 5 + level(caster) / 10;
+                    CALL install_attack_spell(spellpower / 20, 1000, 4, 31);
+                    CALL gain_xp(1, 39);
+             ATTRIGGER CALL attack_check(target);
+                       CALL elt_damage (target, damage, damage_bonus, ELT_WATER, ELT_FIRE, 15);
+
 SPELL death-wave : "#D10" =
       LET level = 1
           school = DARK
@@ -970,8 +985,6 @@ SPELL shear : "#N14" =
                          IF ((name = "Fluffy" || name = "Mouboo" || name = "Pinkie") && random(2))
                          THEN { set @value, 1; callfunc "QuestSagathaHappy"; };
                     )
-
-
 
 SPELL barrier (target : PC) : "#A10" =
       LET level = 1
