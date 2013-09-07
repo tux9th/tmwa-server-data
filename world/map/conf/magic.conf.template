@@ -714,29 +714,29 @@ SPELL magic-knuckles : "#W12" =
                     CALL install_melee_spell(10 + spellpower / 10, 1300, 34);
              ATTRIGGER CALL melee_damage(target, 30, 5 + (str * 2));
 
-#SPELL death-wave : "#D10" =
-#      LET level = 1
-#          school = DARK
-#      IN (MANA 75, CASTTIME 10000,
-#          REQUIRE skill(caster, MAGIC) > level,
-#          REQUIRE skill(caster, school) > level,
-#          REQUIRE (script_int(caster, "OrumQuest") > 50),
-#          COMPONENTS [5 * 704])
-#      => EFFECT CALL adjust_spellpower(school);
-#                CALL default_effect();
-#                CALL gain_xp(3, 30);
-#                sfx(location, SFX_SUMMON_START, 0);
-#                WAIT 500;
-#                sfx(location, SFX_SUMMON_FIRE, 0);
-#                          IF hp(caster) < 220
-#                          THEN itemheal(caster, -220, 0);
-#                        h = (hp(caster) / 2) * -1;
-#                        itemheal(caster, h, 0);
-#                        d = level(caster);
-#                        damage = spellpower;
-#                        damage_bonus = sqrt(spellpower) * 2;
-#                        FOREACH MOB target IN rbox(location(caster), d / 20) DO
-#                                (CALL elt_damage(target, damage, damage_bonus, ELT_HOLY, ELT_SHADOW, 15 + random(5));)
+SPELL death-wave : "#D10" =
+      LET level = 1
+          school = DARK
+      IN (MANA 75, CASTTIME 10000,
+          REQUIRE skill(caster, MAGIC) > level,
+          REQUIRE skill(caster, school) > level,
+          REQUIRE (script_int(caster, "OrumQuest") > 50),
+          COMPONENTS [5 * 704])
+      => EFFECT CALL adjust_spellpower(school);
+                CALL default_effect();
+                CALL gain_xp(3, 30);
+                sfx(location, SFX_SUMMON_START, 0);
+                WAIT 500;
+                sfx(location, SFX_SUMMON_FIRE, 0);
+                          IF hp(caster) < 220
+                          THEN itemheal(caster, -220, 0);
+                        h = (hp(caster) / 2) * -1;
+                        itemheal(caster, h, 0);
+                        d = level(caster);
+                        damage = spellpower;
+                        damage_bonus = sqrt(spellpower) * 2;
+                        FOREACH MOB target IN rbox(location(caster), d / 20) DO
+                                (CALL elt_damage(target, damage, damage_bonus, ELT_HOLY, ELT_SHADOW, 15 + random(5));)
 
 LOCAL SPELL summon-snakes : "#D11" =
       LET level = 1
@@ -751,50 +751,50 @@ LOCAL SPELL summon-snakes : "#D11" =
                 CALL gain_xp(3, 31);
                 CALL summon_dark_spell(1010, 1 + spellpower / 300, 4000 - (spellpower * 9), spellpower * 80, 2);
 
-#LOCAL SPELL summon-black-scorpions : "#D12" =
-#      LET level = 1
-#        school = DARK
-#      IN (MANA 40, CASTTIME 15000,
-#          REQUIRE skill(caster, MAGIC) > level,
-#          REQUIRE skill(caster, school) > level,
-#          REQUIRE (script_int(caster, "OrumQuest") > 50),
-#          COMPONENTS ["Root", "BlackScorpionStinger"])
-#      => EFFECT CALL adjust_spellpower(school);
-#                CALL default_effect();
-#                CALL gain_xp(3, 32);
-#                CALL summon_dark_spell(1009, 1 + spellpower / 300, 4000 - (spellpower * 9), spellpower * 80, 2);
+LOCAL SPELL summon-black-scorpions : "#D12" =
+      LET level = 1
+        school = DARK
+      IN (MANA 40, CASTTIME 15000,
+          REQUIRE skill(caster, MAGIC) > level,
+          REQUIRE skill(caster, school) > level,
+          REQUIRE (script_int(caster, "OrumQuest") > 50),
+          COMPONENTS ["Root", "BlackScorpionStinger"])
+      => EFFECT CALL adjust_spellpower(school);
+                CALL default_effect();
+                CALL gain_xp(3, 32);
+                CALL summon_dark_spell(1009, 1 + spellpower / 300, 4000 - (spellpower * 9), spellpower * 80, 2);
 
-#LOCAL SPELL summon-skeletons : "#D13" = # only release this if content has been adjusted or mob has been replaced with a nerfed one
-#      LET level = 1
-#        school = DARK
-#      IN (MANA 50, CASTTIME 17000,
-#          REQUIRE skill(caster, MAGIC) > level,
-#          REQUIRE skill(caster, school) > level,
-#          REQUIRE (script_int(caster, "OrumQuest") > 50),
-#          COMPONENTS ["Bone", "DarkCrystal"])
-#      => EFFECT CALL adjust_spellpower(school);
-#                CALL default_effect();
-#                CALL gain_xp(3, 33);
-#                CALL summon_dark_spell(1043, spellpower / 325, 4000 - (spellpower * 9), spellpower * 70, 2);
+LOCAL SPELL summon-skeletons : "#D13" = # only release this if content has been adjusted or mob has been replaced with a nerfed one
+      LET level = 1
+        school = DARK
+      IN (MANA 50, CASTTIME 17000,
+          REQUIRE skill(caster, MAGIC) > level,
+          REQUIRE skill(caster, school) > level,
+          REQUIRE (script_int(caster, "OrumQuest") > 50),
+          COMPONENTS ["Bone", "DarkCrystal"])
+      => EFFECT CALL adjust_spellpower(school);
+                CALL default_effect();
+                CALL gain_xp(3, 33);
+                CALL summon_dark_spell(1043, spellpower / 325, 4000 - (spellpower * 9), spellpower * 70, 2);
 
-#SPELL shadow-strike : "#D14" =
-#      LET level = 1
-#        school = DARK
-#      IN (MANA 20, CASTTIME 1300,
-#          REQUIRE skill(caster, MAGIC) > level,
-#          REQUIRE skill(caster, DARK) > 0,
-#          REQUIRE (script_int(caster, "OrumQuest") > 50),
-#          (REQUIRE skill(caster, school) > 2 OR COMPONENTS ["DarkCrystal"]))
-#      => EFFECT CALL adjust_spellpower(school);
-#                CALL default_effect();
-#                damage = spellpower / 2;
-#                damage_bonus = 1 + (spellpower - 150);
-#                CALL install_attack_spell(1 + spellpower / 100, 2800, 8, 31);
-#                  IF hp(caster) > 170
-#                  THEN itemheal(caster, -160, 0);
-#                CALL gain_xp(3, 34);
-#                ATTRIGGER CALL attack_check(target);
-#                CALL elt_damage (target, damage, damage_bonus, ELT_HOLY, ELT_SHADOW, 15 + random(5));
+SPELL shadow-strike : "#D14" =
+      LET level = 1
+        school = DARK
+      IN (MANA 20, CASTTIME 1300,
+          REQUIRE skill(caster, MAGIC) > level,
+          REQUIRE skill(caster, DARK) > 0,
+          REQUIRE (script_int(caster, "OrumQuest") > 50),
+          (REQUIRE skill(caster, school) > 2 OR COMPONENTS ["DarkCrystal"]))
+      => EFFECT CALL adjust_spellpower(school);
+                CALL default_effect();
+                damage = spellpower / 2;
+                damage_bonus = 1 + (spellpower - 150);
+                CALL install_attack_spell(1 + spellpower / 100, 2800, 8, 31);
+                  IF hp(caster) > 170
+                  THEN itemheal(caster, -160, 0);
+                CALL gain_xp(3, 34);
+                ATTRIGGER CALL attack_check(target);
+                CALL elt_damage (target, damage, damage_bonus, ELT_HOLY, ELT_SHADOW, 15 + random(5));
 
 SPELL toxic-dart : "#D15" =
       LET level = 1
