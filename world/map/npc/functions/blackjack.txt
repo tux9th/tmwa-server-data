@@ -106,7 +106,16 @@ L_PlayerAnother1:
         "No.", L_End;
 
 L_Fail:
+    if (@bank3 > 21)
+        goto L_BothLost;
     mes "\"You lost. You had " + @player3 + ", I had " + @bank3 + ".\"";
+    goto L_Close;
+
+L_BothLost:
+    if (@bank3 == @player3)
+        goto L_Tie;
+    mes "\"You had " + @player3 + ", I had " + @bank3 + ". We both lose. You'll get your money back.\"";
+    set Zeny, Zeny + @money;
     goto L_Close;
 
 L_End:
