@@ -1,0 +1,265 @@
+//Author: tux9th
+//using QUEST_MAGIC2
+//replace Rants with Stewcurse Wormcharm Stewgoo
+//replace 2Wizard2 with the name of the Transmutation Master
+//name will be submitted once the script is finished
+
+
+009-1.gat,50,40,0|script|Rants|208,
+{
+//Bitmasks
+    set @trans_MASK, NIBBLE_5_MASK;
+    set @trans_SHIFT, NIBBLE_5_SHIFT;
+
+    set @trans_state, ((QUEST_MAGIC2 & @trans_MASK) >> @trans_SHIFT);
+//Bitmasks END
+
+    if (@trans_state == 6)      goto L_RequireItems;
+    if (@trans_state == 5)      goto L_NotesFound;
+    if (@trans_state == 4)      goto L_WaitNotesFound;
+    if (MAGIC_FLAGS & MFLAG_TRANSMUTATE_IRON) goto L_CreatedIron;
+    if (@trans_state == 3)      goto L_CreateIron;
+    if (@trans_state == 2)      goto L_Back;
+    if (@trans_state == 1)      goto L_FunTalk;
+
+    if (getskilllv(SKILL_MAGIC_TRANSMUTE) > 1)
+        goto L_Greet;
+    mes "[Rants]";
+    mes "\"Don't disturb me. I am busy!\"";
+    goto L_Close;
+
+L_Greet:
+    mes "[Rants]";
+    mes "\"Don't disturb me...\"";
+    mes "The Wizard hesitates, then looks at you. You feel a strange vibe.";
+    mes "\"I see... So you know the bare minimum about Transmutation Magic.\"";
+    menu
+        "Bare Minimum!?", L_BeginFun,
+        "Yes. I was trained by Auldsbel.", -;
+    mes "[Rants]";
+    mes "\"I see. Well, he is a charlatan, telling stories about how he is the best. The living believe him.\"";
+    mes "It seems like the Wizard is trying to laugh but his laugh is so dry and rough that nothing comes out.";
+    mes "\"Do you want to study under a real master of Transmutation Magic?\"";
+    menu
+        "No.", L_Goodbye,
+        "Yes.", -;
+    mes "\"Well then find one!\"";
+    mes "This time the wizard seems to laugh, he can barely stand on his feet because he is shaking so much. Still his laugh are only some gurgling noises";
+    set @trans_state, 2;
+    callsub S_Update_Mask;
+    goto L_Close;
+
+L_BeginFun:
+    mes "[Rants]";
+    mes "\"Oh I see someone overconfident.\"";
+    mes "The wizard mumbles something. You're getting dizzy and your begins to be distorted.";
+    warp "009-1.gat", 50, 42;
+    message strcharinfo(0), "Rants: It seems you never made a veil of protection.";
+    set @trans_state, 1;
+    callsub S_Update_Mask;
+    goto L_Close;
+
+L_FunTalk:
+    mes "[Rants]";
+    mes "The wizard smirks.";
+    mes "\"You're back. I didn't think I would see you again.\"";
+    mes "\"What do you want?\"";
+    menu
+        "What did you do to me?", -,
+        "What is a veil of protection?", L_Veil,
+        "Nothing. See you later.", L_Goodbye;
+    mes "The wizard is still grinning.";
+    mes "\"Nothing.\"";
+    goto L_Close;
+
+L_Back:
+    mes "[Rants]";
+    mes "\"So you are back. What do you want?\"";
+    menu
+        "Can you teach me more about Transmutation Magic?", -,
+        "Nothing. I was just leaving.", L_Goodbye;
+    mes "[Rants]";
+    mes "\"I am no master in Transmutation Magic but I have the feeling I know more than you. If you are worthy I will help you create a transportation tool to reach one of the few masters in Transmutation Magic.\"";
+    next;
+    mes "\"First you have to complete this spell yourself. Take 30 Jars of Blood. Focus on the Iron in the blood. Once you're focused on the Iron say the word " + getspellinvocation("make-radiatingiron") + " and imagine the Iron fusing together forming a lump.\"";
+    set @trans_state, 3;
+    callsub S_Update_Mask;
+    next;
+    goto L_Goodbye;
+
+L_Done:
+    mes "wow";
+    goto L_Close;
+
+L_Veil:
+    mes "[Rants]";
+    mes "\"So you call yourself experienced in Transmutation Magic and you don't know that.\"";
+    mes "He sighs.";
+    mes "\"Come back later, and I'll tell you some things about Transmutation Magic.\"";
+    set @trans_state, 2;
+    callsub S_Update_Mask;
+    goto L_Close;
+
+L_CreateIron:
+    mes "[Rants]";
+    mes "\"Have you completed the spell yet?\"";
+    menu
+        "Yes.", -,
+        "No", L_Goodbye;
+    mes "\"Stop lying. You haven't completed it correctly yet.\"";
+    goto L_Close;
+
+L_CreatedIron:
+    mes "[Rants]";
+    mes "\"Have you completed the spell yet?\"";
+    menu
+        "Yes.", -,
+        "No", L_Goodbye;
+    if (countitem("RadiatingIronLump") < 1)
+        goto L_BringLump;
+    mes "The Wizard takes the Lump and looks at it cloesly.";
+    next;
+    mes "\"This is a superb Transmutation. You have proven yourself. I now shall help you reach 2Wizard2 \"";
+    next;
+    mes "The wizard gives the Lump back to you";
+    next;
+    mes "\"This is going to be complicated. I'll have to go through a lot of notes to find the ingredients needed for this spell.\"";
+    set @time_trans_wait, gettimetick(2);
+    set @trans_state, 4;
+    callsub S_Update_Mask;
+    goto L_Close;
+
+L_WaitNotesFound:
+    if (@time_trans_wait == 0)                  set @time_trans_wait, gettimetick(2);
+    if (gettimetick(2) - @time_trans_wait > 30) goto L_State5;
+    mes "[Rants]";
+    mes "\"You will have to wait longer. I haven't found it yet.\"";
+    goto L_Close;
+
+L_State5:
+    set @trans_state, 5;
+    callsub S_Update_Mask;
+    goto L_NotesFound;
+
+L_NotesFound:
+    mes "[Rants]";
+    mes "\"I found the recipe.\"";
+    next;
+    mes "\"This is going to be hard to get though. Here look at it yourself!\"";
+    goto L_Recipe;
+
+L_Recipe:
+    mes "The wizard hands you a old sheet of paper. You start reading:";
+    next;
+    mes "Transmutate Travel-Blanket";
+    mes "Lay out one thousand pieces of White Fur to form an approximate circle";
+    mes "Lay down fourty Diamonds onto the White Fur to form an approximate circle";
+    mes "Put down four sets of three Jack'O Lanterns each, forming a square.";
+    mes "Set four Skulls around each of the groups of Jack'O Lanterns.";
+    mes "Put one Dark Crystals into each eyesocket and mouth of the skulls respectively.";
+    mes "After you're done setting it up stand in the middle of the circle and spill five Jars of Blood.";
+    mes "One in direction forming a bloodsplatter line going from the center outwards, crossing the lines between each Jack'O Lantern group and splitting the distance in half.";
+    mes "With the last Blood form a circle to stand in.";
+    mes "Then call out #hemhaltrzqrtul and shove a Radiating Iron Lump into the ground";
+    next;
+    mes "[Rants]";
+    mes "\"Bring me the ingredients and I'll make the Travel Blanket for you.\"";
+    set @trans_state, 6;
+    callsub S_Update_Mask;
+    goto L_Close;
+
+L_BringLump:
+    mes "\"You have to give me the Lump. I don't see it on you.\"";
+    mes "\"Come back when you have it with you.\"";
+    goto L_Close;
+
+L_RequireItems:
+    mes "[Rants]";
+    mes "\"Have you brought me all the ingredients?\"";
+    menu
+        "What were the ingredients?", L_Recipe,
+        "No", L_Goodbye,
+        "Yes", -;
+    if ((countitem("WhiteFur") < 1000) | (countitem("JackOLantern") <12) | (countitem("DarkCrystal") < 60) | (countitem("Diamond") < 40) | (countitem("RadiatingIronLump") < 1) | (countitem("Skull") < 20) | (countitem("JarofBlood") < 5))
+        goto L_NotEnough;
+    mes "enough";
+    delitem "WhiteFur", 1000;
+    delitem "JackOLantern", 12;
+    delitem "DarkCrystal", 60;
+    delitem "Diamond", 40;
+    delitem "JarofBlood", 5;
+    delitem "RadiatingIronLump", 1;
+    delitem "Skull", 20;
+    set @trans_state, 7;
+    callsub S_Update_Mask;
+    goto L_Close;
+
+L_NotEnough:
+    mes "not enough";
+    goto L_Close;
+
+L_Goodbye:
+    mes "[Rants]";
+    mes "\"Goodbye then.\"";
+    goto L_Close;
+
+L_Close:
+    set @trans_state, 0;
+    close;
+
+//Bitmasks
+S_Update_Mask:
+    set QUEST_MAGIC2,
+        (QUEST_MAGIC2 & ~(@trans_MASK))
+            | (@trans_state << @trans_SHIFT);
+    return;
+}
+
+
+//_________________________________________________________________________________________________________________
+009-1.gat,52,40,0|script|DebugRants|208,
+{
+    set @trans_MASK, NIBBLE_5_MASK;
+    set @trans_SHIFT, NIBBLE_5_SHIFT;
+
+    set @trans_state, ((QUEST_MAGIC2 & @trans_MASK) >> @trans_SHIFT);
+    if (MAGIC_FLAGS & MFLAG_TRANSMUTATE_IRON) set @mflag, 1;
+
+
+    mes "What do you want to do";
+    mes "current Quest State " + @trans_state;
+    mes "current Made Iron Flag: " + @mflag;
+    menu
+        "Close", -,
+        "set State", L_State,
+        "unset Flag", L_UnsetFlag,
+        "set Flag", L_SetFlag;
+    goto L_Close;
+
+L_State:
+    input @trans_state;
+    callsub S_Update_Mask;
+    goto L_Close;
+
+L_UnsetFlag:
+    set MAGIC_FLAGS, MAGIC_FLAGS & ~MFLAG_TRANSMUTATE_IRON;
+    mes "Please relog now";
+    goto L_Close;
+
+L_SetFlag:
+    set MAGIC_FLAGS, MAGIC_FLAGS | MFLAG_TRANSMUTATE_IRON;
+    goto L_Close;
+
+L_Close:
+    close;
+
+S_Update_Mask:
+    set QUEST_MAGIC2,
+        (QUEST_MAGIC2 & ~(@trans_MASK))
+            | (@trans_state << @trans_SHIFT);
+    return;
+
+OnInit:
+    if (!debug)
+        disablenpc "PaulineDebug";
+}

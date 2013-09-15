@@ -551,7 +551,8 @@ L_MagicSkills:
         "Overview of my magical skills.", L_MagicSkillsOverview,
         "Get magic skills.", L_ChangeMagicSkills,
         "Get magic experience.", L_MagicExperience,
-        "All magic skills to their maximum level and maximum magic experience.", L_GetAllMagic,
+        "All magic skills to level 2 and maximum magic experience.", L_GetAllMagic2,
+        "All magic skills to level 3 and maximum magic experience.", L_GetAllMagic3,
         "Reset magic skills and experience.", L_ResetMagicSkills,
         "Back to the main menu.", L_Begin,
         "Close.", -;
@@ -808,7 +809,7 @@ S_Update_Mask:
             | (@mexp << @debug_shift);
     return;
 
-L_GetAllMagic:
+L_GetAllMagic2:
     setskill SKILL_MAGIC, 2;
     setskill SKILL_MAGIC_LIFE, 2;
     setskill SKILL_MAGIC_WAR, 2;
@@ -816,6 +817,21 @@ L_GetAllMagic:
     setskill SKILL_MAGIC_NATURE, 2;
     setskill SKILL_MAGIC_ASTRAL, 2;
     setskill SKILL_MAGIC_DARK, 2;
+    set @mexp, 8000;
+    callsub S_Update_Mask;
+    mes "Magic skills added.";
+    next;
+    goto L_MagicSkills;
+
+
+L_GetAllMagic3:
+    setskill SKILL_MAGIC, 3;
+    setskill SKILL_MAGIC_LIFE, 3;
+    setskill SKILL_MAGIC_WAR, 3;
+    setskill SKILL_MAGIC_TRANSMUTE, 3;
+    setskill SKILL_MAGIC_NATURE, 3;
+    setskill SKILL_MAGIC_ASTRAL, 3;
+    setskill SKILL_MAGIC_DARK, 3;
     set @mexp, 8000;
     callsub S_Update_Mask;
     mes "Magic skills added.";

@@ -525,6 +525,7 @@ MFLAG_MADE_CONC_POTION     16384 // Made a concentration potion with T15 and/or 
 MFLAG_ELANORE_OMAR         32768 // Told Omar about Elanore's involvement.
 
 MFLAG_KNOWS_UNFOCUS_RECIPE 65536 // Has been told about unfocus by Luca.
+MFLAG_TRANSMUTATE_IRON     131072   // Completed Transmutation of Radiating Iron Lump 17
 
 // Flags set in the FLAGS variable:
 FLAG_HAS_BOWLER_BURNSDAY 1    // every year's poem at burns day, shannon gives you a bowler hat
