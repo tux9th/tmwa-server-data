@@ -1019,6 +1019,18 @@ SPELL shear : "#N14" =
                          THEN { set @value, 1; callfunc "QuestSagathaHappy"; };
                     )
 
+SPELL warp-to-transmutationmaster : "#N15" =
+      LET level = 1
+          school = NATURE
+      IN (MANA 80, CASTTIME 400,
+          REQUIRE skill(caster, MAGIC) > level,
+          REQUIRE skill(caster, school) > level,
+          REQUIRE ((script_int(caster, "QUEST_MAGIC2") & 15728640) >> 20) > 6)
+        => EFFECT CALL default_effect();
+                  WAIT 1000 + (200000 / (spellpower + 10));
+                  sfx(location(caster), SFX_TELEPORT, 200);
+                  warp(caster, @("009-1.gat", 50, 50));
+                  sfx(caster, SFX_TELEPORT, 200);
 
 
 SPELL barrier (target : PC) : "#A10" =

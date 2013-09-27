@@ -14,6 +14,7 @@
     set @trans_state, ((QUEST_MAGIC2 & @trans_MASK) >> @trans_SHIFT);
 //Bitmasks END
 
+    if (@trans_state > 6)       goto L_Done;
     if (@trans_state == 6)      goto L_RequireItems;
     if (@trans_state == 5)      goto L_NotesFound;
     if (@trans_state == 4)      goto L_WaitNotesFound;
@@ -151,7 +152,7 @@ L_NotesFound:
 L_Recipe:
     mes "The wizard hands you a old sheet of paper. You start reading:";
     next;
-    mes "Transmutate Travel-Blanket";
+    mes "Transmutate Travel Blanket";
     mes "Lay out one thousand pieces of White Fur to form an approximate circle";
     mes "Lay down fourty Diamonds onto the White Fur to form an approximate circle";
     mes "Put down four sets of three Jack'O Lanterns each, forming a square.";
@@ -160,7 +161,7 @@ L_Recipe:
     mes "After you're done setting it up stand in the middle of the circle and spill five Jars of Blood.";
     mes "One in direction forming a bloodsplatter line going from the center outwards, crossing the lines between each Jack'O Lantern group and splitting the distance in half.";
     mes "With the last Blood form a circle to stand in.";
-    mes "Then call out #hemhaltrzqrtul and shove a Radiating Iron Lump into the ground";
+    mes "Then call out #hemhaltrzqrtul and shove a Radiating Iron Lump into the center";
     next;
     mes "[Rants]";
     mes "\"Bring me the ingredients and I'll make the Travel Blanket for you.\"";
@@ -190,8 +191,32 @@ L_RequireItems:
     delitem "JarofBlood", 5;
     delitem "RadiatingIronLump", 1;
     delitem "Skull", 20;
+    mes "Once the wizard has all the items he lays them down as explained in the Recipe.";
+    mes "Then he yells #hemhaltrzqrtul";
+    next;
+    mes "Nothing happens ...";
+    next;
+    mes "After a few seconds it starts. The lanterns start to glow, the Crystals start burning the Skulls.";
+    mes "It reaks of burnt Bone";
+    next;
+    mes "The Radiating Iron Lump seems to be the center of the whole transmutation, slowly everything gets drawn to it.";
+    mes "Suddenly the Blood on the ground starts burning and smoking and you cannot see anything anymore";
+    next;
+    mes "The smoke clears";
+    mes "[Rants]";
+    mes "\"It's done. Here is your blanket, which works as a catalyst for the teleportation spell I am going to teach you now.";
+    getitem "TravelBlanket";
+    next;
+    mes "\"If you want to travel to the transmuation wizard use have the travel blanket with you and say " + getspellinvocation("warp-to-transmutationmaster") +".
+    next;
+    mes "\"Now get going.\"";
     set @trans_state, 7;
     callsub S_Update_Mask;
+    goto L_Close;
+
+L_Done:
+    mes "[Rants]";
+    mes "\"Ah. You again. I told you everything for now. Leave me alone.\"";
     goto L_Close;
 
 L_NotEnough:
@@ -217,7 +242,7 @@ S_Update_Mask:
 
 
 //_________________________________________________________________________________________________________________
-009-1.gat,52,40,0|script|DebugRants|208,
+009-1.gat,50,40,0|script|DebugRants|208,
 {
     set @trans_MASK, NIBBLE_5_MASK;
     set @trans_SHIFT, NIBBLE_5_SHIFT;

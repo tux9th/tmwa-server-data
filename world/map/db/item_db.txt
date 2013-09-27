@@ -731,6 +731,8 @@
 2257,   OrangeCottonCloth,              Orange Cotton Cloth,                3,      400,        100,        10,         0,      0,      0,      0,      0,      0,      0,          0,      0,      0,      {},                                                                     {}
 2258,   PurpleCottonCloth,              Purple Cotton Cloth,                3,      400,        100,        10,         0,      0,      0,      0,      0,      0,      0,          0,      0,      0,      {},                                                                     {}
 2259,   DarkGreenCottonCloth,           Dark Green Cotton Cloth,            3,      400,        100,        10,         0,      0,      0,      0,      0,      0,      0,          0,      0,      0,      {},                                                                     {}
+2260,   TravelBlanket,                  Travel Blanket,                     3,      800,        200,        500,        0,      0,      0,      0,      0,      0,      0,          0,      0,      0,      {},                                                                     {}
+
 //ID,   Name___________________,        Label__________________,            Type,   Price,      Sell,       Weight,     ATK,    DEF,    Range,  Mbonus, Slot,   Gender, Loc,        wLV,    eLV,    View,   {UseScript},                                                            {EquipScript}
 
 // Add dyed entries above here. For regular entries,please use the < 1000s.
