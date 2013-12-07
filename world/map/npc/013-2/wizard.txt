@@ -3,6 +3,14 @@
     set @has_magic, getskilllv(SKILL_MAGIC);
     set MAGIC_FLAGS, MAGIC_FLAGS | MFLAG_KNOWS_OLD_WIZARD;
 
+//Bitmasks
+    set @magicreset_MASK, NIBBLE_6_MASK;
+    set @magicreset_SHIFT, NIBBLE_6_SHIFT;
+
+    set @magicreset_state, ((QUEST_MAGIC2 & @magicreset_MASK) >> @magicreset_SHIFT);
+
+//Bitmasks end
+
     mes "[Old Wizard]";
     mes "\"Welcome, dear wanderer! Come into my humble home. Take a rest, eat and drink.\"";
     next;
@@ -26,6 +34,12 @@ L_Thanks:
     mes "[Old Wizard]";
     mes "\"Behind this door, my apprentice will serve you.\"";
     next;
+    if (getskilllv(SKILL_MAGIC_DARK) > 0)
+        menu
+            "Alright.",L_Agree,
+            "I am studying magic, can you help?", L_NewStudent,
+            "Your apprentice? ... No thanks.",L_Decline,
+            "Do you if I could learn Astral Magic?" L_MagicPathReset;
     if (@has_magic)
         menu
             "Alright.", L_Agree,
@@ -124,5 +138,48 @@ L_Agree:
 
 L_Close:
     set @has_magic, 0;
+    set @magicreset_MASK, 0;
+    set @magicreset_SHIFT, 0;
+    set @magicreset_state, 0;
     close;
+
+L_MagicPathReset:
+    mes "[Old Wizard]";
+    mes "\"I see you are a Dark Mage.\"";
+    mes "\"If you want to learn Astral Magic you have to undo the bad which you comitted to become a dark mage.\"";
+    next;
+    mes "\"What did you do?\"";
+    menu
+        "Nothing. I have no idea", L_ClueLess,
+        "[Killed a sick Mouboo, Cut the Druid Tree.]", -;
+    mes "\"I see.\"";
+    mes "\"With proper ingredients and your remorse, undoing this should be achievable.\"";
+    mes "\"Let's start by reviving the Druid Tree.\"";
+    next;
+    mes "The Wizard wanders mumbles something and a book flies into his hand. He starts reading";
+    next;
+    mes "[Old Wizard]";
+    mes "\"Here! I found it.\"";
+    next;
+    mes "He appears to be excited";
+    next;
+    mes "[Old Wizard]";
+    mes "\"Okay okay. Bring me two Pearls, one diseased heart, five Iron Powders and five Grass Seeds. See you later.\"";
+    set @magicreset_state, 1;
+    callsub S_Update_Mask;
+    goto L_Close;
+
+L_ClueLess:
+    mes "[Old Wizard]";
+    mes "\"Well, I cannot help you undo something when you don't know what you have done.\"";
+    mes "\"Come back when you know.\"";
+    close;
+
+S_Update_Mask:
+    set QUEST_MAGIC2,
+        (QUEST_MAGIC2 & ~(@magicreset_MASK))
+            | (@magicreset_state << @magicreset_SHIFT);
+    return;
+
+
 }
