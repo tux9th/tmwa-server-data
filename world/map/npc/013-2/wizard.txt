@@ -11,6 +11,8 @@
 
 //Bitmasks end
 
+    if (@magicreset_state > 1)  goto L_WelcomeBack;
+
     mes "[Old Wizard]";
     mes "\"Welcome, dear wanderer! Come into my humble home. Take a rest, eat and drink.\"";
     next;
@@ -19,6 +21,27 @@
         "Can you teach me magic?", L_TeachRude,
         "Oh, shut up!", L_ShutUp;
     goto L_Close;
+
+L_WelcomeBack:
+    mes "[Old Wizard]";
+    mes "\"Ah you're back. Do you want to talk about driving the dark out of you?\"";
+    menu
+        "No, I'm here to talk to you about magic", L_StarterMenu1,
+        "Yes. Let's get on that", L_ContinuePathReset;
+    goto L_Close;
+
+L_ContinuePathReset:
+    if (@magicreset_state == 1) goto L_BringItemsBranch;
+    if (@magicreset_state == 2) goto L_BroughtItemsBranch;
+    if (@magicreset_state == 3) goto L_InstructionsReviveTree;
+
+L_StarterMenu1
+    mes "[Old Wizard]";
+    mes "\"Well then come into my humble home. Take a rest, eat and drink.\"";
+    menu
+        "Thanks, that's very kind of you!", L_Thanks,
+        "Can you teach me magic?", L_TeachRude,
+        "Oh, shut up!", L_ShutUp;
 
 L_TeachRude:
     mes "[Old Wizard]";
@@ -144,6 +167,7 @@ L_Close:
     close;
 
 L_MagicPathReset:
+    if (@magicreset_state > 1) goto L_ContinuePathReset;
     mes "[Old Wizard]";
     mes "\"I see you are a Dark Mage.\"";
     mes "\"If you want to learn Astral Magic you have to undo the bad which you comitted to become a dark mage.\"";
@@ -164,22 +188,87 @@ L_MagicPathReset:
     mes "He appears to be excited";
     next;
     mes "[Old Wizard]";
-    mes "\"Okay okay. Bring me two Pearls, one diseased heart, five Iron Powders and five Grass Seeds. See you later.\"";
+    mes "\"Okay okay. Bring me two Pearls, one diseased heart, five Iron Powders and five Grass Seeds.
+    mes "\"Bring me the branch of the tree which you cut off as well. Without this we can't get anything done"\";
+    next;
+    mes "\"With this ingredients we're going to revive a branch of the tree which will give the rest of the tree the lifeforce you took by cutting its branch.\"";
+    mes "\"Come back when you got everything.\"";
     set @magicreset_state, 1;
     callsub S_Update_Mask;
     goto L_Close;
 
-L_ClueLess:
+L_Clueless:
     mes "[Old Wizard]";
     mes "\"Well, I cannot help you undo something when you don't know what you have done.\"";
     mes "\"Come back when you know.\"";
     close;
+
+L_BringItemsBranch:
+    mes "[Old Wizard]";
+    mes "\"Have you brought me two Pearls, one diseased heart, five Iron Powders five Grass Seeds and the branch of the tree?\"";
+    menu
+        "No. I don't have them with me", L_ComeBackLater,
+        "Yes, here you are", -;
+    if (countitem(DiseasedHeart) < 1)   goto L_NotEnough;
+    if (countitem(Pearl) < 2)           goto L_NotEnough;
+    if (countitem(IronPowder) < 5)      goto L_NotEnough;
+    if (countitem(GrassSeed) < 5)       goto L_NotEnough;
+    if (countitem(DruidTreeBranch) < 1) goto L_NoteNough;
+    delitem "DiseasedHeart", 1;
+    delitem "Pearl", 2;
+    delitem "IronPowder", 5;
+    delitem "GrassSeed", 5;
+    delitem "DruidTreeBranch", 1;
+    set @magicreset_state, 2;
+    callsub S_Update_Mask;
+    goto L_BroughtItemsBranch;
+
+L_BroughtItemsBranch:
+    mes "[Old Wizard]";
+    mes "The wizard's eyes start gloating";
+    mes "\"Ah all of those magical items at one place radiate an aura of pure strenght. This will be enough for me to revive this branch.\"";
+    mes "He squashes the Heart and grinds it with a mortar. He then dries it with an akward heat spell. After that he grinds the pearls and puts all of the dust into a bowl.";
+    next;
+    mes "Then he pours in the iron powders and the Grass seeds, calls a spell and some very pure water comes out of his index finger. 23 drops of water drip into the bowl.";
+    mes "After that he stirs the dust with the tree branch, while saying words you cannot understand.";
+    next;
+    mes "The branch appears to be absorbing the dust, once all of the dust is gone he looks at you.";
+    next;
+    mes "[Old Wizard]";
+    mes "\"It is done! Take this branch and bring it to the tree. Stick it into the withering tree and the power the branch ingested will be given to the tree.\"";
+    next;
+    mes "\"After you did that pour some bottles of water on the tree. Do this slowly or else the power will be washed into the ground and will vanish.\"";
+    mes "\"I am exhausted I have to rest now. Go and revive the tree.\"";
+    getitem 905, 1;
+    set @magicreset_state, 3;
+    callsub S_Update_Mask;
+    goto L_Close
+
+L_InstructionsReviveTree:
+    mes "[Old Wizard]";
+    mes "\"Have you revived the tree yet?.\"";
+    menu
+        "Yes.", -,
+        "No.", -;
+    if (@magicreset_state > 5) goto L_RevivedTree;
+    mes "[Old Wizard]";
+    mes "\"I feel that you still have the vivid tree branch somewhere around you. Do you remember what you have to do?\"";
+    menu
+        "Yes.", L_ComeBackLater,
+        "No.", -;
+    mes "[Old Wizard]";
+    mes "\"Stick it into the withering tree and the power the branch ingested will be given to the tree.\"";
+    mes "\"After you did that pour some bottles of water on the tree. Do this slowly or else the power will be washed into the ground and will vanish.\"";
+    goto L_Close
+
+L_ComeBackLater:
+    mes "[Old Wizard]";
+    mes "\"Then come back later.\"";
+    goto L_Close;
 
 S_Update_Mask:
     set QUEST_MAGIC2,
         (QUEST_MAGIC2 & ~(@magicreset_MASK))
             | (@magicreset_state << @magicreset_SHIFT);
     return;
-
-
 }

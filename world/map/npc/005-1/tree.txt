@@ -1,5 +1,21 @@
 function|script|QuestTreeTrigger|,
 {
+
+// Bitmasks for Magic Path Reset
+
+    set @magicreset_MASK, NIBBLE_6_MASK;
+    set @magicreset_SHIFT, NIBBLE_6_SHIFT;
+
+    set @magicreset_state, ((QUEST_MAGIC2 & @magicreset_MASK) >> @magicreset_SHIFT);
+
+S_Update_Mask:
+    set QUEST_MAGIC2,
+        (QUEST_MAGIC2 & ~(@magicreset_MASK))
+            | (@magicreset_state << @magicreset_SHIFT);
+    return;
+
+//END - Bitmasks for Magic Path Reset - END
+
     set @Q_MASK, NIBBLE_2_MASK;
     set @Q_SHIFT, NIBBLE_2_SHIFT;
 
@@ -7,9 +23,13 @@ function|script|QuestTreeTrigger|,
     set @Q_status_lower, @Q_status & 3;
     set @Q_status, (@Q_status & 12) >> 2;
 
+    if (@magicreset_state == 3) goto L_HealTree;
+
+
     if (@Q_status & @flag) goto L_Close;  // already did that
 
     if (@flag == 2) goto L_hug;
+
 
 L_cont:
     set @Q_status, @Q_status | @flag;
@@ -154,7 +174,29 @@ L_Close:
     set @Q_MASK, 0;
     set @Q_SHIFT, 0;
     set @Q_status, 0;
+    set @magicreset_MASK, 0;
+    set @magicreset_SHIFT, 0;
+    set @magicreset_state, 0;
+
     close;
+
+L_HealTree:
+    mes "Do you want to put the vivid tree branch into the bark?";
+    menu
+        "Yes [Put in]." -,
+        "No." goto L_Close;
+    delitem 905, 1;
+    mes "You see the branch you put in wither and turn into dust and feel that the tree regains a lot of energy. It looks alive.";
+    set @magicreset_state, 4;
+    callsub S_Update_Mask;
+    goto L_Close;
+
+L_WaterTree:
+    mes "Do you want to water the tree?";
+    menu
+        "No", L_Close,
+        "Yes [Put 15 Bottles of Water on the tree]",
+        "Yes, slowly", ;
 
 }
 
