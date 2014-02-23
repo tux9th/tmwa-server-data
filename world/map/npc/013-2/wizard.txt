@@ -188,7 +188,7 @@ L_MagicPathReset:
     mes "He appears to be excited";
     next;
     mes "[Old Wizard]";
-    mes "\"Okay okay. Bring me two Pearls, one diseased heart, five Iron Powders and five Grass Seeds.
+    mes "\"Okay okay. Bring me two Pearls, one diseased heart, five Iron Powders and five Grass Seeds."\";
     mes "\"Bring me the branch of the tree which you cut off as well. Without this we can't get anything done"\";
     next;
     mes "\"With this ingredients we're going to revive a branch of the tree which will give the rest of the tree the lifeforce you took by cutting its branch.\"";
@@ -209,11 +209,11 @@ L_BringItemsBranch:
     menu
         "No. I don't have them with me", L_ComeBackLater,
         "Yes, here you are", -;
-    if (countitem(DiseasedHeart) < 1)   goto L_NotEnough;
-    if (countitem(Pearl) < 2)           goto L_NotEnough;
-    if (countitem(IronPowder) < 5)      goto L_NotEnough;
-    if (countitem(GrassSeed) < 5)       goto L_NotEnough;
-    if (countitem(DruidTreeBranch) < 1) goto L_NoteNough;
+    if (countitem("DiseasedHeart") < 1)   goto L_NotEnough;
+    if (countitem("Pearl") < 2)           goto L_NotEnough;
+    if (countitem("IronPowder") < 5)      goto L_NotEnough;
+    if (countitem("GrassSeed") < 5)       goto L_NotEnough;
+    if (countitem("DruidTreeBranch") < 1) goto L_NotEnough;
     delitem "DiseasedHeart", 1;
     delitem "Pearl", 2;
     delitem "IronPowder", 5;
@@ -252,14 +252,41 @@ L_InstructionsReviveTree:
         "No.", -;
     if (@magicreset_state > 5) goto L_RevivedTree;
     mes "[Old Wizard]";
-    mes "\"I feel that you still have the vivid tree branch somewhere around you. Do you remember what you have to do?\"";
+    mes "\"What's up?\"";
     menu
-        "Yes.", L_ComeBackLater,
-        "No.", -;
+        "I just didn't get there yet.", L_ComeBackLater,
+        "I failed, the tree withered.", L_NewBranch;
+        "I forgot what to do.", -;
     mes "[Old Wizard]";
-    mes "\"Stick it into the withering tree and the power the branch ingested will be given to the tree.\"";
+    mes "\"Stick the branch into the withering tree and the power the branch ingested will be given to the tree.\"";
     mes "\"After you did that pour some bottles of water on the tree. Do this slowly or else the power will be washed into the ground and will vanish.\"";
     goto L_Close
+
+L_NewBranch:
+    mes "[Old Wizard]";
+    mes "\"Do you want to make another vivid tree branch?\"";
+    menu
+        "Yes", -,
+        "No", L_Close;
+    mes "\"Okay. Bring me two Pearls, one diseased heart, five Iron Powders and five Grass Seeds and another branch of the tree.\"";
+    menu
+        "I'll be back with the stuff", L_Close,
+        "Here you go.", -;
+    if (countitem("DiseasedHeart") < 1)   goto L_NotEnough;
+    if (countitem("Pearl") < 2)           goto L_NotEnough;
+    if (countitem("IronPowder") < 5)      goto L_NotEnough;
+    if (countitem("GrassSeed") < 5)       goto L_NotEnough;
+    if (countitem("DruidTreeBranch") < 1) goto L_NoteNough;
+    delitem "DiseasedHeart", 1;
+    delitem "Pearl", 2;
+    delitem "IronPowder", 5;
+    delitem "GrassSeed", 5;
+    delitem "DruidTreeBranch", 1;
+    mes "The same ritual as before starts and the wizard hands you another vivid tree branch";
+    getitem 905, 1;
+    mes "[Old Wizard]";
+    mes "\"Here you go. Now take better care of this one!\"";
+    goto L_Close;
 
 L_ComeBackLater:
     mes "[Old Wizard]";

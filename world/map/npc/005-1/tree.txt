@@ -1,30 +1,12 @@
 function|script|QuestTreeTrigger|,
 {
 
-// Bitmasks for Magic Path Reset
-
-    set @magicreset_MASK, NIBBLE_6_MASK;
-    set @magicreset_SHIFT, NIBBLE_6_SHIFT;
-
-    set @magicreset_state, ((QUEST_MAGIC2 & @magicreset_MASK) >> @magicreset_SHIFT);
-
-S_Update_Mask:
-    set QUEST_MAGIC2,
-        (QUEST_MAGIC2 & ~(@magicreset_MASK))
-            | (@magicreset_state << @magicreset_SHIFT);
-    return;
-
-//END - Bitmasks for Magic Path Reset - END
-
     set @Q_MASK, NIBBLE_2_MASK;
     set @Q_SHIFT, NIBBLE_2_SHIFT;
 
     set @Q_status, (QUEST_MAGIC & @Q_MASK) >> @Q_SHIFT;
     set @Q_status_lower, @Q_status & 3;
     set @Q_status, (@Q_status & 12) >> 2;
-
-    if (@magicreset_state == 3) goto L_HealTree;
-
 
     if (@Q_status & @flag) goto L_Close;  // already did that
 
@@ -68,6 +50,25 @@ S_update_var:
 
 function|script|QuestTreeTouch|,
 {
+
+// Bitmasks for Magic Path Reset
+
+    set @magicreset_MASK, NIBBLE_6_MASK;
+    set @magicreset_SHIFT, NIBBLE_6_SHIFT;
+
+    set @magicreset_state, ((QUEST_MAGIC2 & @magicreset_MASK) >> @magicreset_SHIFT);
+
+S_Update_Mask:
+    set QUEST_MAGIC2,
+        (QUEST_MAGIC2 & ~(@magicreset_MASK))
+            | (@magicreset_state << @magicreset_SHIFT);
+    return;
+
+//END - Bitmasks for Magic Path Reset - END
+
+    if (@magicreset_state == 3) goto L_HealTree;
+
+
     set @Q_MASK, NIBBLE_2_MASK;
     set @Q_SHIFT, NIBBLE_2_SHIFT;
 
@@ -184,7 +185,7 @@ L_HealTree:
     mes "Do you want to put the vivid tree branch into the bark?";
     menu
         "Yes [Put in]." -,
-        "No." goto L_Close;
+        "No." L_Close;
     delitem 905, 1;
     mes "You see the branch you put in wither and turn into dust and feel that the tree regains a lot of energy. It looks alive.";
     set @magicreset_state, 4;
@@ -195,8 +196,28 @@ L_WaterTree:
     mes "Do you want to water the tree?";
     menu
         "No", L_Close,
-        "Yes [Put 15 Bottles of Water on the tree]",
-        "Yes, slowly", ;
+        "Yes [Put 15 Bottles of Water on the tree]", -,
+        "Yes, slowly [1 Bottle of Water emptied drop by drop]", L_WaterTreeSlow;
+    if (countitem("541") < 15)   goto L_NotEnoughWater;
+    delitem 541, 15;
+    mes "The tree starts to florish and looks alive and healthy.";
+    set @magicreset_state, 5;
+    callsub S_Update_mask;
+    goto L_Close;
+
+L_WaterTreeSlow:
+    if (countitem("541") < 1)   goto L_NotEnoughWater;
+    delitem 541, 1;
+    mes "You empty one Bottle of Water on the ground around the tree. You pour very slowly, the water gets absorbed before the next drop hits the ground.";
+    next;
+    mes "The tree starts to decay. You were to slow.";
+    set @magicreset_state, 3;
+    callsub S_Update_mask;
+    goto L_Close;
+
+L_NotEnoughWater:
+    mes "You do not have enough Water on you.";
+    goto L_Close;
 
 }
 
